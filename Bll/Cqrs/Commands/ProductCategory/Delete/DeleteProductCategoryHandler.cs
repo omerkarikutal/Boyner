@@ -58,7 +58,12 @@ namespace Bll.Cqrs.Commands.ProductCategory.Delete
 
             if (products.Status && products.Data.Count > 0)
             {
-                var updateProducts = products.Data.Select(s => new Core.Entity.Product { Id = s.Id, IsActive = false }).ToList();
+                var updateProducts = products.Data.Select(s => new Core.Entity.Product
+                {
+                    Id = s.Id,
+                    IsActive = false,
+                    ProductCategoryId = s.ProductCategoryId
+                }).ToList();
 
                 await _productRepository.BulkUpdate(updateProducts);
             }
@@ -68,7 +73,13 @@ namespace Bll.Cqrs.Commands.ProductCategory.Delete
 
             if (categoryAttriubtes.Status && categoryAttriubtes.Data.Count > 0)
             {
-                var updateCategoryAttributes = categoryAttriubtes.Data.Select(s => new Core.Entity.CategoryAttribute { Id = s.Id, IsActive = false }).ToList();
+                var updateCategoryAttributes = categoryAttriubtes.Data.Select(s => new Core.Entity.CategoryAttribute
+                {
+                    Id = s.Id,
+                    IsActive = false,
+                    ProductCategoryId = s.ProductCategoryId,
+                    AttributeValueId = s.AttributeValueId
+                }).ToList();
 
                 await _categoryAttributeRepsoitory.BulkUpdate(updateCategoryAttributes);
             }

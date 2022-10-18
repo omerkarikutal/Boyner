@@ -50,7 +50,13 @@ namespace Bll.Cqrs.Commands.Product.Delete
             //attributes değerleri pasif hale getirildi.
             if (getAttributes.Status && getAttributes.Data.Count > 0)
             {
-                var updateAttributes = getAttributes.Data.Select(s => new ProductAttribute { Id = s.Id, IsActive = false }).ToList();
+                var updateAttributes = getAttributes.Data.Select(s => new ProductAttribute
+                {
+                    Id = s.Id,
+                    IsActive = false,
+                    ProductId = s.ProductId,
+                    AttributeValueId = s.AttributeValueId
+                }).ToList();
 
                 await _productAttributeRepository.BulkUpdate(updateAttributes);
             }

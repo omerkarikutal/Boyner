@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,17 +35,17 @@ namespace Bll.Cqrs.Queries.Product.GetAll
                 productList = JsonConvert.DeserializeObject<List<Core.Entity.Product>>(result.Data);
             else
             {
-                var getDb = await _productRepository.GetAllAsync(s => s.IsActive, x => x.ProductCategory);
+                var getDb = await _productRepository.GetAllAsync(s => s.IsActive, x => x.ProductCategory, x => x.ProductAttributes);
 
                 productList = getDb.Data;
 
-                var setRedis = await _redisService.SetAsync(DefaultCacheKey.ProductKey, JsonConvert.SerializeObject(productList), TimeSpan.FromMinutes(10));
+                var setRedis = await _redisService.SetAsync(DefaultCacheKey.ProductKey, productList, TimeSpan.FromMinutes(10));
             }
 
 
             var data = productList.Where(s =>
-            (request.Name == string.Empty || s.Name == request.Name) &&
-            (request.CategoryName == string.Empty || s.ProductCategory.Name == request.CategoryName) &&
+            (request.Name == null || s.Name.ToLower().Contains(request.Name.ToLower())) &&
+            (request.CategoryName == null || s.ProductCategory.Name.ToLower().Contains(request.CategoryName.ToLower())) &&
             (s.Price > request.MinPrice && s.Price < request.MaxPrice)).ToList();
 
 

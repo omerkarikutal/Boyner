@@ -35,15 +35,16 @@ namespace Bll.Cqrs.Queries.ProductCategory.GetAllProductCategory
                 productList = JsonConvert.DeserializeObject<List<Core.Entity.ProductCategory>>(result.Data);
             else
             {
-                var getDb = await _productCategoryRepository.GetAllAsync(s => s.IsActive);
+                var getDb = await _productCategoryRepository.GetAllAsync(s => s.IsActive, x => x.CategoryAtrributes, x => x.Products);
 
                 productList = getDb.Data;
 
-                var setRedis = await _redisService.SetAsync(DefaultCacheKey.ProductCategoryKey, JsonConvert.SerializeObject(productList), TimeSpan.FromMinutes(10));
+                var setRedis = await _redisService.SetAsync(DefaultCacheKey.ProductCategoryKey, productList, TimeSpan.FromMinutes(10));
             }
-
-
-            var data = productList.Where(s => (request.Name == string.Empty || s.Name.Contains(request.Name))).ToList();
+            var attributesList = request.Attributes.ToList();
+            //todo düzenlenecek
+            var data = productList.Where(s => (request.Name == null || s.Name.ToLower().Contains(request.Name.ToLower()))
+            && (request.Attributes.Count == 0)).ToList();
 
             return new BaseResponse<List<Core.Entity.ProductCategory>>().Success(data);
         }

@@ -12,8 +12,8 @@ namespace Bll.Cqrs.Queries.Product.GetAll
     {
         public string? Name { get; set; }
         public string? CategoryName { get; set; }
-        public double? MinPrice { get; set; }
-        public double? MaxPrice { get; set; }
+        public double? MinPrice { get; set; } = 0;
+        public double? MaxPrice { get; set; } = 0;
 
     }
 }
