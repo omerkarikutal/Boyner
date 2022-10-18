@@ -17,5 +17,6 @@ namespace Core.Repository
         Task<BaseResponse<T>> Edit(T Entity);
         Task<BaseResponse<int>> Delete(int id);
         Task<BaseResponse<int>> AddRangeAsync(List<T> entities);
+        Task<BaseResponse<int>> BulkUpdate(List<T> data);
     }
 }

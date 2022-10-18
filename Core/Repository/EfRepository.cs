@@ -1,5 +1,6 @@
 ﻿using Core.Entity;
 using Core.Model;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,19 @@ namespace Core.Repository
                 //await context.SaveChangesAsync();
                 return new BaseResponse<int>().Success(1);
 
+            }
+            catch (Exception e)
+            {
+                return new BaseResponse<int>().Fail(e.Message);
+            }
+        }
+
+        public async Task<BaseResponse<int>> BulkUpdate(List<TEntity> data)
+        {
+            try
+            {
+                await context.BulkUpdateAsync(data);
+                return new BaseResponse<int>().Success(1);
             }
             catch (Exception e)
             {

@@ -3,6 +3,7 @@ using Core.Model;
 using Core.Repository;
 using Dal.Abstract;
 using DataAccess.Concrete.EF.Context;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

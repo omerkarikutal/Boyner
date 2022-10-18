@@ -1,4 +1,5 @@
 ﻿using Core.Consts;
+using Core.Entity;
 using Core.Model;
 using Core.Redis;
 using Dal.Abstract;
@@ -40,13 +41,21 @@ namespace Bll.Cqrs.Commands.Product.Delete
 
             var deleteResult = await _productRepository.Delete(request.Id);
 
+
+            #region bulkupdates
             var getAttributes = await _productAttributeRepository.GetAllAsync(s => s.ProductId == request.Id && s.IsActive);
 
 
-
+            //attribute ler update ediliyor
             //attributes değerleri pasif hale getirildi.
-            //if (getAttributes.Status && getAttributes.Data.Count > 0)
-            //    await _productAttributeRepository.BulkUpdate(request.Id);
+            if (getAttributes.Status && getAttributes.Data.Count > 0)
+            {
+                var updateAttributes = getAttributes.Data.Select(s => new ProductAttribute { Id = s.Id, IsActive = false }).ToList();
+
+                await _productAttributeRepository.BulkUpdate(updateAttributes);
+            }
+            #endregion
+
             //transaction commitle
             var trResult = await _unitOfWorkService.CommitTransactionAsync(tr.Data);
 

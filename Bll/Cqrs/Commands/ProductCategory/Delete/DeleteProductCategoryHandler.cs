@@ -1,4 +1,5 @@
 ﻿using Core.Consts;
+using Core.Entity;
 using Core.Model;
 using Core.Redis;
 using Dal.Abstract;
@@ -49,12 +50,30 @@ namespace Bll.Cqrs.Commands.ProductCategory.Delete
 
 
 
+            //bu kategoriye bağlı product lar ve attributeler soft delete yapılıyor
+            //bulkupdate todo
+
+            #region bulkupdates
             var products = await _productRepository.GetAllAsync(s => s.ProductCategoryId == request.Id && s.IsActive);
+
+            if (products.Status && products.Data.Count > 0)
+            {
+                var updateProducts = products.Data.Select(s => new Core.Entity.Product { Id = s.Id, IsActive = false }).ToList();
+
+                await _productRepository.BulkUpdate(updateProducts);
+            }
+
 
             var categoryAttriubtes = await _categoryAttributeRepsoitory.GetAllAsync(s => s.ProductCategoryId == request.Id && s.IsActive);
 
-            //bu kategoriye bağlı product lar ve attributeler soft delete yapılıyor
-            //bulkupdate todo
+            if (categoryAttriubtes.Status && categoryAttriubtes.Data.Count > 0)
+            {
+                var updateCategoryAttributes = categoryAttriubtes.Data.Select(s => new Core.Entity.CategoryAttribute { Id = s.Id, IsActive = false }).ToList();
+
+                await _categoryAttributeRepsoitory.BulkUpdate(updateCategoryAttributes);
+            }
+            #endregion
+
 
             //transaction commitle
             var trResult = await _unitofWorkService.CommitTransactionAsync(tr.Data);
